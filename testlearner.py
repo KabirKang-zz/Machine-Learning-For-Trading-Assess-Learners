@@ -28,7 +28,8 @@ import sys
   		  	   		   	 			  		 			 	 	 		 		 	
 import numpy as np  		  	   		   	 			  		 			 	 	 		 		 	
   		  	   		   	 			  		 			 	 	 		 		 	
-import LinRegLearner as lrl  		  	   		   	 			  		 			 	 	 		 		 	
+import LinRegLearner as lrl
+import DTLearner as dtl
   		  	   		   	 			  		 			 	 	 		 		 	
 if __name__ == "__main__":  		  	   		   	 			  		 			 	 	 		 		 	
     # if len(sys.argv) != 2:
@@ -50,13 +51,13 @@ if __name__ == "__main__":
     test_x = data[train_rows:, 0:-1]  		  	   		   	 			  		 			 	 	 		 		 	
     test_y = data[train_rows:, -1]  		  	   		   	 			  		 			 	 	 		 		 	
   		  	   		   	 			  		 			 	 	 		 		 	
-    print(f"{test_x.shape}")  		  	   		   	 			  		 			 	 	 		 		 	
-    print(f"{test_y.shape}")  		  	   		   	 			  		 			 	 	 		 		 	
-  		  	   		   	 			  		 			 	 	 		 		 	
-    # create a learner and train it  		  	   		   	 			  		 			 	 	 		 		 	
-    learner = lrl.LinRegLearner(verbose=True)  # create a LinRegLearner  		  	   		   	 			  		 			 	 	 		 		 	
+    print(f"{test_x.shape}")
+    print(f"{test_y.shape}")
+
+    # create a learner and train it
+    learner = dtl.DTLearner(leaf_size=1, verbose=True)  # create a LinRegLearner
     learner.add_evidence(train_x, train_y)  # train it  		  	   		   	 			  		 			 	 	 		 		 	
-    print(learner.author())  		  	   		   	 			  		 			 	 	 		 		 	
+    print(learner.author())
   		  	   		   	 			  		 			 	 	 		 		 	
     # evaluate in sample  		  	   		   	 			  		 			 	 	 		 		 	
     pred_y = learner.query(train_x)  # get the predictions  		  	   		   	 			  		 			 	 	 		 		 	
