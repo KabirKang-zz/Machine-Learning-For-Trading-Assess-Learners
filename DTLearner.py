@@ -40,6 +40,7 @@ class DTLearner(object):
         """  		  	   		   	 			  		 			 	 	 		 		 	
         self.leaf_size = leaf_size
         self.verbose = verbose
+        self.tree = None
 
     def author(self):  		  	   		   	 			  		 			 	 	 		 		 	
         """  		  	   		   	 			  		 			 	 	 		 		 	
@@ -49,16 +50,35 @@ class DTLearner(object):
         return "kkang68"
 
     def get_split_feature(self, data_x, data_y):
+        print('get split')
         num_features = data_x.shape[1]
         max_corr = 0
         split_index = 0
-        for i in range(num_features):
+        for i in range(0, num_features):
             feature = data_x[:, i]
-            corr = abs(np.corrcoef(feature, data_y, rowvar=False)[0,1])
+            print(f'i {i}')
+            print(f'x {feature.shape}')
+            print(f'y {data_y[:].shape}')
+            corr = abs(np.corrcoef(feature, data_y[:], rowvar=False)[0, 1])
+            print(f'corr {corr}')
             if corr > max_corr:
                 split_index = i
                 max_corr = corr
         return split_index
+
+    def build_tree(self, data_x, data_y):
+        # if data.shape[0]: return [leaf, data.y, NA, NA]
+        # if all data.y same: return [leaf, data.y, NA, NA]
+        if data_x.shape[0] <= self.leaf_size or len(np.unique(data_y)) == 1:
+            return np.asarray([np.nan, data_y, np.nan, np.nan])
+        else:
+            # determine best feature i to split on (feature with highest correlation with y)
+            feature_i = self.get_split_feature(data_x, data_y)
+            split_val = np.median(data_x[:, feature_i])
+            left_tree = self.build_tree(data_x[data_x[:, feature_i] <= split_val], data_y[data_x[:, feature_i] <= split_val])
+            right_tree = self.build_tree(data_x[data_x[:, feature_i] > split_val], data_y[data_x[:, feature_i] > split_val])
+            root = np.asarray([feature_i, split_val, 1, left_tree.shape[0]+1])
+            return np.concatenate((root, left_tree, right_tree))
 
     def add_evidence(self, data_x, data_y):  		  	   		   	 			  		 			 	 	 		 		 	
         """  		  	   		   	 			  		 			 	 	 		 		 	
@@ -69,20 +89,9 @@ class DTLearner(object):
         :param data_y: The value we are attempting to predict given the X data  		  	   		   	 			  		 			 	 	 		 		 	
         :type data_y: numpy.ndarray  		  	   		   	 			  		 			 	 	 		 		 	
         """
-        # build_tree(data)
-        # if data.shape[0]: return [leaf, data.y, NA, NA]
-        # if all data.y same: return [leaf, data.y, NA, NA]
-        if data_x.shape[0] <= self.leaf_size or len(np.unique(data_y)) == 1:
-            return np.asarray([np.nan, data_y, np.nan, np.nan])
-        else:
-        # determine best feature i to split on (feature with highest correlation with y)
-            feature_i = self.get_split_feature(data_x, data_y)
-            split_val = data_x[:, feature_i].median()
-            left_tree = self.add_evidence(data_x[data_x[:, feature_i] <= split_val], data_y)
-            right_tree = self.add_evidence(data_x[data_x[:, feature_i] > split_val], data_y)
-        # root = [i, SplitVal, 1, lefttree.shape[0]+1]
-        # return (append(root, lefttree, righttree))
-        # slap on 1s column so linear regression finds a constant term  		  	   		   	 			  		 			 	 	 		 		 	
+        self.tree = self.build_tree(data_x, data_y)
+        print(self.tree)
+        # slap on 1s column so linear regression finds a constant term
         # new_data_x = np.ones([data_x.shape[0], data_x.shape[1] + 1])
         # new_data_x[:, 0 : data_x.shape[1]] = data_x
         #
