@@ -24,9 +24,9 @@ GT honor code violation.
 """
 
 import numpy as np
+from random import randrange
 
-
-class DTLearner(object):
+class RTLearner(object):
     """
     This is a Linear Regression Learner. It is implemented correctly.
 
@@ -51,16 +51,7 @@ class DTLearner(object):
         return "kkang68"
 
     def get_split_feature(self, data_x, data_y):
-        num_features = data_x.shape[1]
-        max_corr = 0
-        split_index = 0
-        for i in range(0, num_features):
-            feature = data_x[:, i]
-            corr = abs(np.corrcoef(feature, data_y[:], rowvar=False)[0, 1])
-            if corr > max_corr:
-                split_index = i
-                max_corr = corr
-        return split_index
+        return randrange(data_x.shape[1])
 
     def build_tree(self, data_x, data_y):
         if data_x.shape[0] <= self.leaf_size:
