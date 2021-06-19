@@ -91,19 +91,11 @@ class DTLearner(object):
         """
         self.tree = self.build_tree(data_x, data_y)
 
-    def query(self, data_x):
-        """
-            Estimate a set of test points given the model we built.
-
-            :param data_x: A numpy array with each row corresponding to a specific query.
-            :type data_x: numpy.ndarray
-            :return: The predicted result of the input data according to the trained model
-            :rtype: numpy.ndarray
-            """
-        result = np.empty([data_x.shape[0]])
-        for i in range(0, data_x.shape[0]):
+    def query(self, points):
+        result = np.empty([points.shape[0]])
+        for i in range(0, points.shape[0]):
             curr = 0
-            x_row = data_x[i]
+            x_row = points[i]
             while not np.isnan(self.tree[curr][0]):
                 curr_node = self.tree[curr]
                 feature = x_row[int(curr_node[0])]
